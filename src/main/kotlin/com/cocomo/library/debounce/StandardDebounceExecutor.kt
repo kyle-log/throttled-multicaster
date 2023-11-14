@@ -11,9 +11,9 @@ class StandardDebounceExecutor(
         cacheManager.getCache("debounce-storage") ?: throw IllegalStateException("Cache not ready")
     }
 
-    override fun execute(type: DebounceEventType, key: DebounceKey, f: () -> Unit): Executed =
+    override fun execute(type: DebounceGroup, key: DebounceKey, f: () -> Unit): Executed =
         if (alreadyDebounced(key)) {
-            println("already debounced: $key")
+            println("Skip: $key")
             Executed(false)
         } else {
             f()
@@ -26,6 +26,7 @@ class StandardDebounceExecutor(
             put(type.value, CacheValue(key.value))
             put(key.value, CacheValue.any())
 
+            println("Execute: $key")
             Executed(true)
         }
 

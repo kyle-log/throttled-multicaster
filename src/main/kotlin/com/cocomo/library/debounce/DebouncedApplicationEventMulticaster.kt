@@ -39,7 +39,7 @@ class DebouncedApplicationEventMulticaster(
         ) {
             val debouncedEvent = event.payload as DebouncedEvent
             debounceExecutor.execute(
-                type = debouncedEvent.debounceEventType,
+                type = debouncedEvent.debounceGroup,
                 key = debouncedEvent.debounceKey,
             ) {
                 doInvokeListener(listener, event)

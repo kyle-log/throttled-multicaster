@@ -1,16 +1,16 @@
 package com.cocomo.library.debounce
 
 interface DebouncedEvent {
-    val debounceEventType: DebounceEventType
+    val debounceGroup: DebounceGroup
     val debounceKey: DebounceKey
 }
 
 @JvmInline
-value class DebounceEventType private constructor(
+value class DebounceGroup private constructor(
     val value: String
 ) {
     companion object {
-        fun of(id: String) = DebounceEventType(value = id)
+        fun of(id: String) = DebounceGroup(value = id)
     }
 }
 
