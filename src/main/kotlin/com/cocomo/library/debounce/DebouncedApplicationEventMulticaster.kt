@@ -9,7 +9,7 @@ import org.springframework.core.ResolvableType
 import org.springframework.util.ErrorHandler
 
 class DebouncedApplicationEventMulticaster(
-    private val debounceStorage: DebounceStorage,
+    private val debounceExecutor: DebounceExecutor,
     private val errorHandler: ErrorHandler = AlwaysThrowErrorHandler(),
 ) : AbstractApplicationEventMulticaster() {
 
@@ -38,7 +38,7 @@ class DebouncedApplicationEventMulticaster(
             (event.payload is DebouncedEvent)
         ) {
             val debouncedEvent = event.payload as DebouncedEvent
-            debounceStorage.debounceIfNotYet(
+            debounceExecutor.execute(
                 type = debouncedEvent.debounceEventType,
                 key = debouncedEvent.debounceKey,
             ) {

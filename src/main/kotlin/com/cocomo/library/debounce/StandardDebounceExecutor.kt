@@ -3,25 +3,33 @@ package com.cocomo.library.debounce
 import org.springframework.cache.Cache
 import org.springframework.cache.CacheManager
 
-class StandardDebounceStorage(
+class StandardDebounceExecutor(
     val cacheManager: CacheManager,
-) : DebounceStorage {
+) : DebounceExecutor {
 
     private val cache: Cache by lazy {
         cacheManager.getCache("debounce-storage") ?: throw IllegalStateException("Cache not ready")
     }
 
-    override fun alreadyDebounced(key: DebounceKey): Boolean = get(key.value) != null
+    override fun execute(type: DebounceEventType, key: DebounceKey, f: () -> Unit): Executed =
+        if (alreadyDebounced(key)) {
+            println("already debounced: $key")
+            Executed(false)
+        } else {
+            f()
 
-    override fun debounce(type: DebounceEventType, key: DebounceKey) {
-        // Evict old cache
-        get(type.value)?.let { oldKey -> evict(oldKey.value) }
-        evict(type.value)
+            // Evict old cache
+            get(type.value)?.let { oldKey -> evict(oldKey.value) }
+            evict(type.value)
 
-        // Put new cache
-        put(type.value, CacheValue(key.value))
-        put(key.value, CacheValue.any())
-    }
+            // Put new cache
+            put(type.value, CacheValue(key.value))
+            put(key.value, CacheValue.any())
+
+            Executed(true)
+        }
+
+    private fun alreadyDebounced(key: DebounceKey): Boolean = get(key.value) != null
 
     private fun get(cacheKey: String): CacheValue? = runCatching {
         cache.get(cacheKey, CacheValue::class.java)
