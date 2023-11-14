@@ -1,9 +1,7 @@
 package com.cocomo
 
-import com.cocomo.library.event.ApplicationEventPublisherAdapter
-import com.cocomo.library.debounce.DebouncedApplicationEventMulticaster
-import com.cocomo.library.debounce.DebounceExecutor
-import com.cocomo.library.debounce.StandardDebounceExecutor
+import com.cocomo.library.debounce.*
+import com.cocomo.library.event.*
 import com.cocomo.worker.EventHandler
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
@@ -31,16 +29,23 @@ class Configuration {
 
     // You can change cacheManager to redis or something
     @Bean
-    fun debounceStorage() = StandardDebounceExecutor(
+    fun debounceExecutor() = StandardDebounceExecutor(
         cacheManager = ConcurrentMapCacheManager(),
     )
+
+    @Bean
+    fun applicationEventProcessor(
+        debounceExecutor: DebounceExecutor,
+    ) = StandardApplicationEventProcessor()
+        .decoratedBy { DebouncedApplicationEventProcessor(it, debounceExecutor) }
 
     // Do not change bean name
     @Bean("applicationEventMulticaster")
     fun debouncedApplicationEventMulticaster(
-        debounceExecutor: DebounceExecutor,
-    ) = DebouncedApplicationEventMulticaster(
-        debounceExecutor = debounceExecutor,
+        applicationEventProcessor: ApplicationEventProcessor,
+    ) = CustomApplicationEventMulticaster(
+        applicationEventProcessor = applicationEventProcessor,
+        errorHandler = AlwaysThrowErrorHandler()
     )
 
     @Bean

@@ -11,22 +11,21 @@ class StandardDebounceExecutor(
         cacheManager.getCache("debounce-storage") ?: throw IllegalStateException("Cache not ready")
     }
 
-    override fun execute(type: DebounceGroup, key: DebounceKey, f: () -> Unit): Executed =
+    override fun execute(group: DebounceGroup, key: DebounceKey, f: () -> Unit): Executed =
         if (alreadyDebounced(key)) {
-            println("Skip: $key")
+            println("Skipped: $key")
             Executed(false)
         } else {
             f()
 
             // Evict old cache
-            get(type.value)?.let { oldKey -> evict(oldKey.value) }
-            evict(type.value)
+            get(group.value)?.let { oldKey -> evict(oldKey.value) }
+            evict(group.value)
 
             // Put new cache
-            put(type.value, CacheValue(key.value))
+            put(group.value, CacheValue(key.value))
             put(key.value, CacheValue.any())
 
-            println("Execute: $key")
             Executed(true)
         }
 
