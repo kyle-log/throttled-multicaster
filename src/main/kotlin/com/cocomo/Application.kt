@@ -1,6 +1,6 @@
 package com.cocomo
 
-import com.cocomo.library.debounce.*
+import com.cocomo.library.throttle.*
 import com.cocomo.library.event.*
 import com.cocomo.worker.EventHandler
 import org.springframework.boot.autoconfigure.SpringBootApplication
@@ -29,19 +29,19 @@ class Configuration {
 
     // You can change cacheManager to redis or something
     @Bean
-    fun debounceExecutor() = StandardDebounceExecutor(
+    fun throttledExecutor() = StandardThrottleExecutor(
         cacheManager = ConcurrentMapCacheManager(),
     )
 
     @Bean
     fun applicationEventProcessor(
-        debounceExecutor: DebounceExecutor,
+        throttleExecutor: ThrottleExecutor,
     ) = StandardApplicationEventProcessor()
-        .decoratedBy { DebouncedApplicationEventProcessor(it, debounceExecutor) }
+        .decoratedBy { ThrottledApplicationEventProcessor(it, throttleExecutor) }
 
     // Do not change bean name
     @Bean("applicationEventMulticaster")
-    fun debouncedApplicationEventMulticaster(
+    fun throttledApplicationEventMulticaster(
         applicationEventProcessor: ApplicationEventProcessor,
     ) = CustomApplicationEventMulticaster(
         applicationEventProcessor = applicationEventProcessor,

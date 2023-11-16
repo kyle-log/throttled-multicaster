@@ -7,6 +7,6 @@ class EventHandler {
 
     @EventListener
     fun handle(event: UserRegionChangedEvent) {
-        println("Executed: ${event.debounceKey}")
+        println("Executed: ${event.throttleValue}")
     }
 }

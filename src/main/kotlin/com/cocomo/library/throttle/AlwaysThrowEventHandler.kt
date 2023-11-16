@@ -1,4 +1,4 @@
-package com.cocomo.library.debounce
+package com.cocomo.library.throttle
 
 import org.springframework.util.ErrorHandler
 

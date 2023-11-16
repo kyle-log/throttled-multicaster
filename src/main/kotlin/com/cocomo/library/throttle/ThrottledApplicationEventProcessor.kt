@@ -1,19 +1,19 @@
-package com.cocomo.library.debounce
+package com.cocomo.library.throttle
 
 import com.cocomo.library.event.ApplicationEventProcessor
 import org.springframework.context.ApplicationEvent
 import org.springframework.context.PayloadApplicationEvent
 import org.springframework.context.event.GenericApplicationListener
 
-class DebouncedApplicationEventProcessor(
+class ThrottledApplicationEventProcessor(
     private val delegate: ApplicationEventProcessor,
-    private val debounceExecutor: DebounceExecutor,
+    private val throttleExecutor: ThrottleExecutor,
 ) : ApplicationEventProcessor {
 
     override fun process(listener: GenericApplicationListener, event: ApplicationEvent) {
         runCatching {
-            val payload = (event as PayloadApplicationEvent<*>).payload as DebouncedEvent
-            debounceExecutor.execute(payload.debounceGroup, payload.debounceKey) {
+            val payload = (event as PayloadApplicationEvent<*>).payload as ThrottledEvent
+            throttleExecutor.execute(payload.throttleKey, payload.throttleValue) {
                 delegate.process(listener, event)
             }
         }.getOrElse {

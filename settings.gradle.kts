@@ -1,1 +1,1 @@
-rootProject.name = "debounced-multicaster"
+rootProject.name = "throttled-multicaster"

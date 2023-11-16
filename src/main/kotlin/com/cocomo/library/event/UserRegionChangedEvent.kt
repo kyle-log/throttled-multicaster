@@ -1,13 +1,13 @@
 package com.cocomo.library.event
 
-import com.cocomo.library.debounce.DebounceGroup
-import com.cocomo.library.debounce.DebounceKey
-import com.cocomo.library.debounce.DebouncedEvent
+import com.cocomo.library.throttle.ThrottleKey
+import com.cocomo.library.throttle.ThrottleValue
+import com.cocomo.library.throttle.ThrottledEvent
 
 data class UserRegionChangedEvent(
     val userId: Long,
     val regionId: Long,
-    // debounce information
-    override val debounceGroup: DebounceGroup = DebounceGroup.of("UserRegionChangedEvent(userId:$userId)"),
-    override val debounceKey: DebounceKey = DebounceKey.of("$userId$regionId"),
-) : DebouncedEvent
+    // throttle information
+    override val throttleKey: ThrottleKey = ThrottleKey.of("UserRegionChangedEvent(userId:$userId)"),
+    override val throttleValue: ThrottleValue = ThrottleValue.of("$userId$regionId"),
+) : ThrottledEvent
